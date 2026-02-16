@@ -96,14 +96,41 @@ class RssAggregator:
             seen_links = set()
 
             for feed in self.config.feeds:
-                log.info(f"Fetching feed id={feed.id} url={feed.url}")
-                resp = requests.get(
-                    feed.url,
-                    headers={"User-Agent": self.user_agent},
-                    timeout=10,
-                )
-                resp.raise_for_status()
-                parsed = feedparser.parse(resp.content)
+                try:
+                    log.info("fetch: id=%s url=%s", feed.id, feed.url)
+
+                    resp = requests.get(
+                        feed.url,
+                        headers={"User-Agent": self.user_agent},
+                        timeout=self.timeout_seconds,
+                    )
+
+                    resp.raise_for_status()
+
+                    parsed = feedparser.parse(resp.content)
+
+                    if getattr(parsed, "bozo", False):
+                        log.warning(
+                            "fetch: id=%s bozo_parse=true exception=%r",
+                            feed.id,
+                            getattr(parsed, "bozo_exception", None),
+                        )
+
+                except requests.exceptions.Timeout:
+                    log.warning("fetch: id=%s timeout", feed.id)
+                    continue
+
+                except requests.exceptions.HTTPError as e:
+                    log.warning("fetch: id=%s http_error=%s", feed.id, str(e))
+                    continue
+
+                except requests.exceptions.RequestException as e:
+                    log.warning("fetch: id=%s request_error=%s", feed.id, str(e))
+                    continue
+
+                except Exception as e:
+                    log.exception("fetch: id=%s unexpected_error=%s", feed.id, str(e))
+                    continue
 
                 for entry in parsed.entries:
                     link = (entry.get("link") or "").strip()
