@@ -11,6 +11,26 @@ from .aggregator import RssAggregator
 
 APP_START = dt.datetime.now(dt.timezone.utc)
 
+from flask import abort, request
+
+RSS_PORT = int(os.getenv("RSS_PORT", "44444"))
+STATUS_PORT = int(os.getenv("STATUS_PORT", "33333"))
+
+def _require_server_port(expected_port: int) -> None:
+    """
+    Enforce that this handler only answers requests received on the expected
+    local listener port (Gunicorn bind). Uses SERVER_PORT from the WSGI environ.
+
+    Returns 404 on mismatch to avoid revealing the endpoint exists on the other port.
+    """
+    port_str = request.environ.get("SERVER_PORT", "")
+    try:
+        actual_port = int(port_str)
+    except (TypeError, ValueError):
+        actual_port = None
+
+    if actual_port != expected_port:
+        abort(404)
 
 def create_app():
     logging.basicConfig(
@@ -43,6 +63,7 @@ def create_app():
 
     @app.get("/rss")
     def rss():
+        _require_server_port(RSS_PORT)
         with lock:
             rss_hits["count"] += 1
             logging.info(f"/rss hit from {request.remote_addr}")
@@ -51,6 +72,7 @@ def create_app():
 
     @app.get("/status")
     def status():
+        _require_server_port(RSS_PORT)
         with lock:
             data = {
                 "uptime": dt.datetime.now(dt.timezone.utc) - APP_START,
