@@ -70,10 +70,18 @@ def _matches_any(text: str, rules: List[FilterRule]) -> bool:
 
 
 class RssAggregator:
-    def __init__(self, config: AppConfig, user_agent: str, max_items: int = 15):
+    def __init__(self, config: AppConfig, user_agent: str, max_items: Optional[int] = None):
         self.config = config
         self.user_agent = user_agent
-        self.max_items = max_items
+
+        if max_items is None:
+            try:
+                self.max_items = int(os.getenv("MAX_ITEMS", "15"))
+            except ValueError:
+                self.max_items = 15
+            else:
+                self.max_items = max_items
+                
         self.current_items: List[AggregatedItem] = []
         self.last_refresh_message = "never"
         self.last_refresh_ok = False

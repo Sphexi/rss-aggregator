@@ -2,9 +2,11 @@ services:
   rss-aggregator:
     image: ghcr.io/sphexi/rss-aggregator:main
     container_name: rss-aggregator
-    restart: unless-stopped
+    environment:
+      - MAX_ITEMS=50
     ports:
       - "44444:44444"
       - "33333:33333"
     volumes:
       - /path/to/config.json:/app/config:ro
+    restart: unless-stopped
