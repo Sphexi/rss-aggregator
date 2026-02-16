@@ -2,6 +2,7 @@ import datetime as dt
 import logging
 import re
 import time
+import os
 from dataclasses import dataclass
 from typing import List, Optional
 
@@ -81,7 +82,7 @@ class RssAggregator:
                 self.max_items = 15
             else:
                 self.max_items = max_items
-                
+
         self.current_items: List[AggregatedItem] = []
         self.last_refresh_message = "never"
         self.last_refresh_ok = False
