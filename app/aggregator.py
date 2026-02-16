@@ -102,11 +102,10 @@ class RssAggregator:
                     resp = requests.get(
                         feed.url,
                         headers={"User-Agent": self.user_agent},
-                        timeout=self.timeout_seconds,
+                        timeout=10,
                     )
 
                     resp.raise_for_status()
-
                     parsed = feedparser.parse(resp.content)
 
                     if getattr(parsed, "bozo", False):
