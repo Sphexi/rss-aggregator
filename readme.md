@@ -1,4 +1,4 @@
-# RSS Aggregator (Filtered Cybersecurity Feed)
+# RSS Aggregator (w/ filtering)
 
 ## Intro
 
