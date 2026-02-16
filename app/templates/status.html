@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Status</title>
+</head>
+<body>
+<h1>RSS Aggregator Status</h1>
+
+<h2>Overall</h2>
+<p>Uptime: {{ uptime }}</p>
+<p>RSS Hits: {{ rss_hits }}</p>
+<p>Last Refresh: {{ last_refresh }}</p>
+
+<h2>Feeds</h2>
+{% for f in feeds %}
+<p>ID {{ f.id }} - {{ f.url }}</p>
+{% endfor %}
+
+<h2>Current Items</h2>
+{% for item in items %}
+<p>{{ item.published }} - <a href="{{ item.link }}">{{ item.title }}</a></p>
+{% endfor %}
+
+</body>
+</html>

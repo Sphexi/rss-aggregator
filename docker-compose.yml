@@ -1,0 +1,10 @@
+services:
+  rss-aggregator:
+    build: .
+    container_name: rss-aggregator
+    restart: unless-stopped
+    ports:
+      - "44444:44444"
+      - "33333:33333"
+    volumes:
+      - ./config:/app/config:ro
