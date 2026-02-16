@@ -72,7 +72,7 @@ def create_app():
 
     @app.get("/status")
     def status():
-        _require_server_port(RSS_PORT)
+        _require_server_port(STATUS_PORT)
         with lock:
             data = {
                 "uptime": dt.datetime.now(dt.timezone.utc) - APP_START,
