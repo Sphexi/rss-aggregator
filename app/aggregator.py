@@ -201,6 +201,9 @@ class RssAggregator:
             fe.title(item.title)
             fe.link(href=item.link)
             fe.pubDate(item.published)
-            fe.description(item.summary or item.content or "")
+            desc = item.summary or item.content or ""
+            if len(desc) > 250:
+                desc = desc[:250] + "…"
+            fe.description(desc)
 
         return fg.rss_str(pretty=True)
