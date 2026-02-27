@@ -4,3 +4,4 @@ requests==2.32.3
 feedparser==6.0.11
 feedgen==1.0.0
 gunicorn==22.0.0
+bleach==6.1.0

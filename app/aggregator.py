@@ -10,6 +10,9 @@ import feedparser
 import requests
 from feedgen.feed import FeedGenerator
 
+import html
+import bleach
+
 from .config import AppConfig, FilterRule, FeedConfig
 
 log = logging.getLogger("rss_aggregator")
@@ -69,6 +72,13 @@ def _matches_any(text: str, rules: List[FilterRule]) -> bool:
                 return True
     return False
 
+def html_to_text(s: str) -> str:
+    if not s:
+        return ""
+    text = bleach.clean(s, tags=[], attributes={}, strip=True)
+    text = html.unescape(text)
+    text = text.replace("\xa0", " ")
+    return " ".join(text.split())
 
 class RssAggregator:
     def __init__(self, config: AppConfig, user_agent: str, max_items: Optional[int] = None):
@@ -143,9 +153,14 @@ class RssAggregator:
                     title = (entry.get("title") or "").strip()
                     summary = (entry.get("summary") or "").strip()
 
+                    title = html_to_text(title)
+                    summary = html_to_text(summary)
+
                     content = ""
                     if entry.get("content"):
                         content = entry["content"][0].get("value", "").strip()
+                    
+                    content = html_to_text(content)
 
                     blob = "\n".join([x for x in (title, summary, content) if x])
 
